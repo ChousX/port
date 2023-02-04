@@ -3,6 +3,7 @@ mod repository;
 mod utils;
 mod error;
 mod prelude;
+mod models;
 use repository::surrealdb_repo::SurrealDBRepo;
 
 #[actix_web::main] // or #[tokio::main]
