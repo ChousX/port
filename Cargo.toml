@@ -14,3 +14,5 @@ surrealdb = "1.0.0-beta.8"
 uuid = "1.3.0"
 thiserror = "1"
 futures = "0.3"
+actix-web-lab = "0.18.9"
+courier = { path = "../courier"}
