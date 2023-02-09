@@ -1,4 +1,4 @@
-use actix_web::{get, web::Data, App, HttpServer, Responder, web::scope};
+use actix_web::{web::Data, App, HttpServer, web::scope};
 mod repository;
 mod utils;
 mod error;
