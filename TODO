@@ -1,0 +1,10 @@
+Revamp how we modlel
+
+NewUser: Creates a new user entry
+UserCookie: Send this back once you login request wethor or not it worked
+    
+UserCookie{
+    LoggedIn: bool
+    data: EncryptedBlock
+
+}
