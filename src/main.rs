@@ -20,8 +20,8 @@ async fn main() -> std::io::Result<()> {
                 scope("/api")
                     .app_data(db_data.clone())
                     .service(create_user) 
-                    .service(get_user) 
-                    .service(get_users)
+                    // .service(get_user) 
+                    // .service(get_users)
             )
             // .service(
             //     spa()

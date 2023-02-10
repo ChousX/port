@@ -1,5 +1,4 @@
 #[derive(thiserror::Error, Debug)]
-
 pub enum Error {
 
 	#[error("Value not of type '{0}'")]

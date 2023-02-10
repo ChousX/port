@@ -1,8 +1,13 @@
-use std::sync::Arc;
-use surrealdb::sql::Value;
-use surrealdb::{Datastore, Session, Error};
+use std::{sync::Arc, fmt::format};
+use futures::Future;
+use surrealdb::{sql::{Value, Object, thing}, Response};
+use std::collections::BTreeMap;
+use crate::utils::{macros::map};
+use surrealdb::{Datastore, Session};
+use crate::prelude::*;
 
-pub trait Creatable: Into<Value> {}
+pub trait Creatable: Into<Value> {
+}
 pub trait Patchable: Into<Value> {}
 
 #[derive(Clone)]
@@ -18,5 +23,18 @@ impl SurrealDBRepo {
         let ses = Session::for_kv().with_ns("test").with_db("test");
 
         Ok(SurrealDBRepo { ses, ds })
+    }
+
+    pub async fn create<T: Creatable>(&self, title: &str, data: T) -> Result<(), Error> {
+        let sql = "CREATE type::table($title) CONTENT $data";
+        let data: Object = W(data.into()).try_into()?;
+        let vars: BTreeMap<String, Value> = map!{
+            "title".into() => title.into(),
+            "data".into() => Value::from(data)
+        };
+        match self.ds.execute(sql, &self.ses, Some(vars), false).await{
+            Ok(_) => Ok(()),
+            Err(err) => Err(err.into()),
+        }
     }
 }
