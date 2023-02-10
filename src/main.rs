@@ -6,7 +6,7 @@ mod prelude;
 pub mod model;
 mod api;
 use repository::surrealdb_repo::SurrealDBRepo;
-use api::todo_api::{create_todo, get_todos, get_todo, update_todo, delete_todo};
+use api::user_api::*;
 use actix_web_lab::web::spa;
 
 #[actix_web::main]
@@ -19,21 +19,19 @@ async fn main() -> std::io::Result<()> {
             .service(
                 scope("/api")
                     .app_data(db_data.clone())
-                    .service(create_todo) 
-                    .service(get_todos) 
-                    .service(get_todo) 
-                    .service(update_todo) 
-                    .service(delete_todo) 
+                    .service(create_user) 
+                    .service(get_user) 
+                    .service(get_users)
             )
-            .service(
-                spa()
-                    .index_file("./dist/index.html")
-                    .static_resources_mount("/")
-                    .static_resources_location("./dist")
-                    .finish()
-            )
+            // .service(
+            //     spa()
+            //         .index_file("./dist/index.html")
+            //         .static_resources_mount("/")
+            //         .static_resources_location("./dist")
+            //         .finish()
+            // )
     })
-    .bind(("0.0.0.0", 9000))?
+    .bind(("127.0.0.1", 8080))?
     .run()
     .await
 }
