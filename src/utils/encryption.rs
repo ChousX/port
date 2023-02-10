@@ -18,10 +18,10 @@ pub fn gen_salt(input: &str) -> {
 
 }
 
-pub fn salt_pos(input: &str) -> usize{
-    let len = input.len();
+pub fn salt_pos(password: &str) -> usize{
+    let len = password.len();
     let mut acum = 0;
-    for (i, c) in input.char_indices(){
+    for (i, c) in password.char_indices(){
         let c: u32 =  c.into();
         let c: usize = c as usize;
         acum += c * i;
