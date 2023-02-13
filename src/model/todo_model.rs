@@ -5,7 +5,7 @@ use surrealdb::sql::{Object, Value, thing, Array};
 
 use crate::prelude::*;
 use crate::utils::{macros::map};
-use crate::repository::surrealdb_repo::{Creatable, Patchable, SurrealDBRepo};
+use crate::repository::surrealdb_repo::{SurrealDBRepo};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Todo {
@@ -19,22 +19,21 @@ impl From<Todo> for Value {
         match val.id {
             Some(v) => {
                 map![
-                    "id".into() => v.into(),
-                    "title".into() => val.title.into(),
-                    "body".into() => val.body.into(),
+                    "id" => v,
+                    "title" => val.title,
+                    "body"=> val.body
             ].into()
             },
             None => {
                 map![
-                    "title".into() => val.title.into(),
-                    "body".into() => val.body.into()
+                    "title"=> val.title,
+                    "body" => val.body
                 ].into()
             }
         }
     }
 }
 
-impl Creatable for Todo{}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TodoPatch {
@@ -58,7 +57,6 @@ impl From<TodoPatch> for Value {
     }
 }
 
-impl Patchable for TodoPatch {}
 
 pub struct TodoBMC;
 
@@ -76,14 +74,14 @@ impl TodoBMC {
         array.into_iter().map(|value| W(value).try_into()).collect()
     }
 
-    pub async fn create<T: Creatable>(db: Data<SurrealDBRepo>, tb: &str, data: T) -> Result<Object, Error> {
+    pub async fn create<T: Into<Value>>(db: Data<SurrealDBRepo>, tb: &str, data: T) -> Result<Object, Error> {
         let sql = "CREATE type::table($tb) CONTENT $data RETURN *";
 
         let data: Object = W(data.into()).try_into()?;
 
 		let vars: BTreeMap<String, Value> = map![
-			"tb".into() => tb.into(),
-			"data".into() => Value::from(data)];
+			"tb" => tb,
+			"data" => Value::from(data)];
 
 		let ress = db.ds.execute(sql, &db.ses, Some(vars), false).await?;
 		
@@ -97,7 +95,7 @@ impl TodoBMC {
             
             let tid = format!("todo:{}", tid);
 
-            let vars: BTreeMap<String, Value> = map!["th".into() => thing(&tid)?.into()];
+            let vars: BTreeMap<String, Value> = map!["th" => thing(&tid)?];
     
             let ress = db.ds.execute(sql, &db.ses, Some(vars), true).await?;
     
@@ -106,14 +104,14 @@ impl TodoBMC {
             W(first_res.result?.first()).try_into()
            
     }
-    pub async fn update<T: Patchable>(db: Data<SurrealDBRepo>, tid: &str, data: T) -> Result<Object, Error> {
+    pub async fn update<T: Into<Value>>(db: Data<SurrealDBRepo>, tid: &str, data: T) -> Result<Object, Error> {
     	let sql = "UPDATE $th MERGE $data RETURN *";
 
         let tid = format!("todo:{}", tid);
 
     	let vars = map![
-	    "th".into() => thing(&tid)?.into(),
-	    "data".into() => data.into()];
+	    "th" => thing(&tid)?,
+	    "data" => data];
 
         let ress = db.ds.execute(sql, &db.ses, Some(vars), true).await?;
 
@@ -129,7 +127,7 @@ impl TodoBMC {
     
         let tid = format!("todo:{}", tid);
     
-        let vars = map!["th".into() => thing(&tid)?.into()];
+        let vars = map!["th" => thing(&tid)?];
     
         let ress = db.ds.execute(sql, &db.ses, Some(vars), false).await?;
     

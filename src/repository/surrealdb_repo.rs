@@ -6,10 +6,6 @@ use crate::utils::{macros::map};
 use surrealdb::{Datastore, Session};
 use crate::prelude::*;
 
-pub trait Creatable: Into<Value> {
-}
-pub trait Patchable: Into<Value> {}
-
 #[derive(Clone)]
 pub struct SurrealDBRepo {
     pub ds: Arc<Datastore>,
@@ -25,12 +21,12 @@ impl SurrealDBRepo {
         Ok(SurrealDBRepo { ses, ds })
     }
 
-    pub async fn create<T: Creatable>(&self, title: &str, data: T) -> Result<(), Error> {
+    pub async fn create<T: Into<Value>>(&self, title: &str, data: T) -> Result<(), Error> {
         let sql = "CREATE type::table($title) CONTENT $data";
         let data: Object = W(data.into()).try_into()?;
         let vars: BTreeMap<String, Value> = map!{
-            "title".into() => title.into(),
-            "data".into() => Value::from(data)
+            "title" => title,
+            "data" => Value::from(data)
         };
         match self.ds.execute(sql, &self.ses, Some(vars), false).await{
             Ok(_) => Ok(()),

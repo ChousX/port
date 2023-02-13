@@ -17,4 +17,5 @@ futures = "0.3"
 actix-web-lab = "0.18.9"
 pwbox = "0.5.0"
 rand = "0.8.5"
-# courier = { path = "../courier"}
+courier = { path = "../courier"}
+env_logger = "0.10.0"
